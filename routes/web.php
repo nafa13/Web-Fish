@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\FishStatusController;
 
 // Redirect root "/" -> Login
 Route::get('/', function () {
@@ -28,3 +30,17 @@ Route::post('/logout', function () {
     Auth::logout();
     return redirect('/login')->with('success', 'Anda berhasil logout.');
 })->name('logout');
+
+// Route Group untuk Schedule
+Route::middleware('auth')->group(function () {
+    Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+    Route::post('/schedule', [ScheduleController::class, 'store'])->name('schedule.store');
+    Route::delete('/schedule/{id}', [ScheduleController::class, 'destroy'])->name('schedule.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    // Route Dashboard & Schedule yang sudah ada...
+    
+    // Route Fish Status
+    Route::get('/fish-status', [FishStatusController::class, 'index'])->name('fish.status');
+});

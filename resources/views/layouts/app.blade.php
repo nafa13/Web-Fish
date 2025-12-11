@@ -6,144 +6,209 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Fish Feeder' }}</title>
 
+    {{-- Bootstrap & Icons --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    {{-- Google Fonts --}}
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-dark: #0b1120;       /* Hitam Kebiruan Gelap */
-            --sidebar-bg: #151e32;    /* Navy Gelap */
-            --card-bg: #1e293b;       /* Abu-abu Kebiruan */
-            --accent: #3b82f6;        /* Biru Neon */
-            --accent-hover: #2563eb;  /* Biru lebih gelap saat hover */
-            --text-main: #f8fafc;     /* Putih Terang */
-            --text-muted: #94a3b8;    /* Abu-abu Teks */
+            /* Warna Tema Baru */
+            --sidebar-bg: #0f172a;
+            /* Slate 900 (Gelap Elegan) */
+            --main-bg: #f1f5f9;
+            /* Slate 100 (Abu-abu Muda Bersih) */
+            --accent-gradient: linear-gradient(90deg, #3b82f6 0%, #06b6d4 100%);
+            /* Biru ke Cyan */
+            --text-sidebar: #cbd5e1;
+            /* Slate 300 */
+            --text-sidebar-hover: #ffffff;
         }
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+            background-color: var(--main-bg);
+            /* Ubah ke terang agar kartu dashboard pop-up */
+            color: #334155;
+            overflow-x: hidden;
         }
 
         /* SIDEBAR STYLING */
         .sidebar {
-            width: 260px;
+            width: 280px;
             height: 100vh;
             position: fixed;
-            background: var(--sidebar-bg);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            padding-top: 30px;
-            transition: all 0.3s;
+            top: 0;
+            left: 0;
+            background-color: var(--sidebar-bg);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
         }
 
-        .sidebar h4 {
-            font-weight: 600;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 2rem;
-        }
-
-        .sidebar a {
-            color: var(--text-muted);
+        /* Logo Brand */
+        .brand-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
             text-decoration: none;
-            padding: 15px 25px;
             display: flex;
             align-items: center;
-            font-size: 15px;
-            transition: 0.3s;
-            border-left: 3px solid transparent;
+            margin-bottom: 3rem;
+            padding-left: 0.5rem;
         }
 
-        .sidebar a i {
+        .brand-logo i {
+            font-size: 1.8rem;
+            margin-right: 10px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Menu Links */
+        .nav-link {
+            color: var(--text-sidebar);
+            font-weight: 500;
+            padding: 12px 20px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            /* Rounded Pills */
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .nav-link i {
+            font-size: 1.25rem;
             margin-right: 12px;
-            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
         }
 
-        .sidebar a:hover, .sidebar a.active {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--accent);
-            border-left: 3px solid var(--accent);
+        .nav-link:hover {
+            color: var(--text-sidebar-hover);
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateX(5px);
         }
 
-        /* CONTENT AREA */
-        .content {
-            margin-left: 260px;
-            padding: 40px;
-        }
-
-        /* GLOBAL CARD STYLE */
-        .card {
-            background-color: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        /* Active State */
+        .nav-link.active {
+            background: var(--accent-gradient);
             color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
-        
-        h5 { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        h2 { font-weight: 600; }
-        hr { border-color: rgba(255, 255, 255, 0.1); }
 
-        /* BUTTON STYLE */
-        .btn-primary {
-            background-color: var(--accent);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
+        /* MAIN CONTENT */
+        .content {
+            margin-left: 280px;
+            padding: 2.5rem;
+            min-height: 100vh;
         }
-        .btn-primary:hover {
-            background-color: var(--accent-hover);
+
+        /* Logout Button Area */
+        .logout-container {
+            margin-top: auto;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .logout-btn {
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.2);
+            border: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: 0.3s;
         }
-        .logout-btn:hover {
+
+        .btn-logout:hover {
             background: #ef4444;
             color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Utility */
+        .page-header {
+            margin-bottom: 2rem;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="sidebar">
-        <h4 class="text-center">🐟 Fish Feeder</h4>
+    {{-- SIDEBAR --}}
+    <aside class="sidebar">
+        <a href="/dashboard" class="brand-logo">
+            <i class="bi bi-tsunami"></i> Fish Feeder
+        </a>
 
-        <div class="mt-4">
-            <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
-                <i class="bi bi-grid-fill"></i> Dashboard
+        <nav class="d-flex flex-column">
+            <a href="/dashboard" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
+                <i class="bi bi-grid-fill"></i>
+                <span>Dashboard</span>
             </a>
-            <a href="#"><i class="bi bi-alarm"></i> Schedule</a>
-            <a href="#"><i class="bi bi-graph-up"></i> Fish Status</a>
-            <a href="#"><i class="bi bi-sliders"></i> Settings</a>
-        </div>
 
-        <div class="px-4" style="position: absolute; bottom: 30px; width: 100%;">
+            <a href="{{ route('schedule.index') }}" class="nav-link {{ request()->is('schedule*') ? 'active' : '' }}">
+                <i class="bi bi-calendar-range"></i>
+                <span>Schedule</span>
+            </a>
+
+            <a href="{{ route('fish.status') }}" class="nav-link {{ request()->is('fish-status*') ? 'active' : '' }}">
+                <i class="bi bi-activity"></i>
+                <span>Fish Status</span>
+            </a>
+
+            <a href="#" class="nav-link {{ request()->is('settings*') ? 'active' : '' }}">
+                <i class="bi bi-gear-fill"></i>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="logout-container">
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
-                <button class="btn logout-btn w-100 py-2">
-                    <i class="bi bi-box-arrow-right"></i> Logout
+                <button class="btn-logout">
+                    <i class="bi bi-box-arrow-left me-2"></i> Logout
                 </button>
             </form>
         </div>
-    </div>
+    </aside>
 
-    <div class="content">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="fw-bold">{{ $pageTitle ?? 'Overview' }}</h3>
-            <span class="badge bg-secondary px-3 py-2 rounded-pill">{{ date('d M Y') }}</span>
+    {{-- CONTENT AREA --}}
+    <main class="content">
+        <div class="d-flex justify-content-between align-items-center page-header">
+            <div>
+                <h4 class="fw-bold mb-0 text-dark">{{ $title ?? 'Overview' }}</h4>
+                <p class="text-muted small mb-0">{{ date('l, d F Y') }}</p>
+            </div>
+
+            <div class="d-flex align-items-center gap-3 bg-white px-3 py-2 rounded-pill shadow-sm">
+                <div class="text-end lh-1">
+                    <small class="d-block fw-bold text-dark">{{ auth()->user()->name ?? 'Guest' }}</small>
+                    <small class="text-muted" style="font-size: 10px;">Admin</small>
+                </div>
+                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center text-primary fw-bold"
+                    style="width: 35px; height: 35px; border: 2px solid #e2e8f0;">
+                    {{ substr(auth()->user()->name ?? 'G', 0, 1) }}
+                </div>
+            </div>
         </div>
-        
-        @yield('content')
-    </div>
 
+        @yield('content')
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
