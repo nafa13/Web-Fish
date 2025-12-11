@@ -162,7 +162,7 @@
             </div>
         @endif
 
-        <form method="POST" action="{{ route('login') }}" class="text-start">
+        <form method="POST" action="{{ url('/login') }}" class="text-start">
             @csrf
             
             <div class="mb-3">
