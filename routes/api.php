@@ -2,12 +2,16 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ApiController;
+// PENTING: Panggil Controller yang baru Anda buat (MobileFishController)
+use App\Http\Controllers\Api\MobileFishController;
 
-// Route untuk Login dari HP
-Route::post('/login', [ApiController::class, 'login']);
+// 1. Route Login (Sesuai permintaan Flutter)
+// URL: http://ip-address/api/login
+Route::post('/login', [MobileFishController::class, 'login']);
 
-// Group Route yang butuh login (opsional: bisa pakai sanctum nanti, sekarang kita buka dulu biar mudah dites)
-Route::get('/dashboard-data', [ApiController::class, 'getDashboardData']);
-Route::post('/feed-now', [ApiController::class, 'feedNow']);
-Route::post('/sensor-data', [ApiController::class, 'storeSensorData']); // Untuk Arduino kirim data
+// 2. Route Simpan Suhu (Sesuai fungsi insertSuhu di MobileFishController)
+// URL: http://ip-address/api/insert-suhu
+Route::post('/insert-suhu', [MobileFishController::class, 'insertSuhu']);
+
+// 3. Route Ambil Data (Opsional, jika nanti mau menampilkan suhu di Flutter)
+Route::get('/get-suhu', [MobileFishController::class, 'getLatestSuhu']);
