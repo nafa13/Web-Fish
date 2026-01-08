@@ -89,23 +89,6 @@
                 </div>
             </div>
         </div>
-
-        {{-- Card 3: Manual Control (Warna Aksen: Biru Utama) --}}
-        <div class="col-md-4">
-            <div class="card h-100 hover-card rounded-4 border-0 shadow-sm">
-                <div class="card-body p-4 d-flex flex-column justify-content-center text-center">
-                    <h5 class="fw-bold mb-3 text-primary">Kontrol Manual</h5>
-                    <p class="text-muted small mb-4">Tekan tombol di bawah untuk memberi makan ikan saat ini juga.</p>
-                    
-                    <form action="{{ route('feed.now') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold shadow-lg py-3 position-relative overflow-hidden group">
-                            <span class="position-relative z-1"><i class="bi bi-send-fill me-2"></i> BERI MAKAN SEKARANG</span>
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 
     {{-- Footer Kecil (Opsional) --}}

@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 // PENTING: Panggil Controller yang baru Anda buat (MobileFishController)
 use App\Http\Controllers\Api\MobileFishController;
+use App\Http\Controllers\FeedingLogController;
 
 // 1. Route Login (Sesuai permintaan Flutter)
 // URL: http://ip-address/api/login
@@ -15,3 +16,4 @@ Route::post('/insert-suhu', [MobileFishController::class, 'insertSuhu']);
 
 // 3. Route Ambil Data (Opsional, jika nanti mau menampilkan suhu di Flutter)
 Route::get('/get-suhu', [MobileFishController::class, 'getLatestSuhu']);
+Route::post('/record-feeding', [FeedingLogController::class, 'storeFromFlutter']);

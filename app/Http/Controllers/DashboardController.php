@@ -44,21 +44,4 @@ class DashboardController extends Controller
         return view('dashboard', compact('totalFeedingToday', 'nextSchedule'));
     }
 
-    public function feedNow()
-    {
-        // ... (Kode HTTP Request ke ESP32 tetap sama) ...
-
-        // 2. Simpan Log ke Database
-        // Perbaikan: Kita hanya simpan 'fed_at' karena tabel yang kita buat tadi 
-        // belum punya kolom status/type/user_id agar tidak error column not found.
-        
-        FeedingLog::create([
-            'fed_at' => now(),
-            // 'status' => 'success', // Dihapus sementara (tabel belum ada kolom ini)
-            // 'type'   => 'manual',  // Dihapus sementara
-            // 'user_id' => Auth::id(), // Dihapus sementara
-        ]);
-
-        return back()->with('success', 'Perintah pakan berhasil dikirim!');
-    }
 }
