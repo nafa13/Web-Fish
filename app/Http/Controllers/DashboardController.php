@@ -4,74 +4,59 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\FeedingLog;
-use App\Models\Schedule; // Pastikan Model Schedule di-import
+use App\Models\Schedule; 
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http; 
 
 class DashboardController extends Controller
 {
-    /**
-     * Menampilkan halaman dashboard dengan data dinamis.
-     */
     public function index()
     {
-        // 1. Ambil jumlah pakan hari ini (Reset setiap tengah malam)
+        // 1. Ambil jumlah pakan hari ini
         $totalFeedingToday = FeedingLog::whereDate('fed_at', Carbon::today())->count();
 
-        // 2. Logika Next Schedule (AMBIL DARI DATABASE)
-        $now = Carbon::now();
-        $currentTimeString = $now->format('H:i:s');
-
+        // 2. Logika Next Schedule (SUDAH DIPERBAIKI)
+        
         // Cari jadwal hari ini yang waktunya > waktu sekarang
-        // Contoh: Sekarang jam 09:00, cari jadwal jam 12:00, 17:00, dst.
-        $nextScheduleData = Schedule::where('is_active', true)
-            ->where('feeding_time', '>', $currentTimeString)
-            ->orderBy('feeding_time', 'asc')
-            ->first();
+        // Menggunakan kolom: 'aktif' dan 'waktu'
+        $nextScheduleData = Schedule::where('aktif', 1)
+                                    ->where('waktu', '>', now()->format('H:i:s'))
+                                    ->orderBy('waktu', 'asc')
+                                    ->first();
 
         if ($nextScheduleData) {
-            // Jika ada jadwal nanti hari ini
-            $nextSchedule = Carbon::parse($nextScheduleData->feeding_time)->format('H:i');
+            // JIKA ADA jadwal hari ini
+            // Perbaikan: Gunakan ->waktu bukan ->feeding_time
+            $nextSchedule = Carbon::parse($nextScheduleData->waktu)->format('H:i');
         } else {
-            // Jika tidak ada jadwal lagi hari ini, ambil jadwal paling pagi untuk BESOK
-            $firstScheduleTomorrow = Schedule::where('is_active', true)
-                ->orderBy('feeding_time', 'asc')
+            // JIKA TIDAK ADA, ambil jadwal paling pagi untuk BESOK
+            // Perbaikan: Gunakan 'aktif' dan 'waktu' di sini juga
+            $firstScheduleTomorrow = Schedule::where('aktif', 1)
+                ->orderBy('waktu', 'asc')
                 ->first();
                 
             $nextSchedule = $firstScheduleTomorrow 
-                ? Carbon::parse($firstScheduleTomorrow->feeding_time)->format('H:i') . ' (Besok)'
-                : '--:--'; // Jika database jadwal kosong sama sekali
+                ? Carbon::parse($firstScheduleTomorrow->waktu)->format('H:i') . ' (Besok)'
+                : '--:--'; 
         }
 
         return view('dashboard', compact('totalFeedingToday', 'nextSchedule'));
     }
 
-    /**
-     * Menangani logika tombol "Feed Now" (Pakan Manual).
-     */
     public function feedNow()
     {
-        // 1. Logika kirim perintah ke Hardware (ESP32) - Uncomment jika alat sudah siap
-        /*
-        try {
-            // Timeout 3 detik agar loading web tidak lama jika alat mati
-            $response = Http::timeout(3)->get('http://192.168.1.100/feed');
-            
-            if ($response->failed()) {
-                return back()->with('error', 'Gagal terkoneksi ke alat pemberi pakan.');
-            }
-        } catch (\Exception $e) {
-            // return back()->with('error', 'Alat tidak ditemukan / Offline.');
-        }
-        */
+        // ... (Kode HTTP Request ke ESP32 tetap sama) ...
 
         // 2. Simpan Log ke Database
+        // Perbaikan: Kita hanya simpan 'fed_at' karena tabel yang kita buat tadi 
+        // belum punya kolom status/type/user_id agar tidak error column not found.
+        
         FeedingLog::create([
             'fed_at' => now(),
-            'status' => 'success',
-            'type'   => 'manual',
-            'user_id' => Auth::id(),
+            // 'status' => 'success', // Dihapus sementara (tabel belum ada kolom ini)
+            // 'type'   => 'manual',  // Dihapus sementara
+            // 'user_id' => Auth::id(), // Dihapus sementara
         ]);
 
         return back()->with('success', 'Perintah pakan berhasil dikirim!');

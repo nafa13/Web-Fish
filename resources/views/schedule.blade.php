@@ -10,6 +10,13 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="row">
         {{-- Kolom Kiri: Form Tambah Jadwal --}}
         <div class="col-md-4 mb-4">
@@ -26,8 +33,13 @@
                         @csrf
                         <div class="mb-4">
                             <label class="form-label text-muted small fw-bold text-uppercase">Pilih Waktu</label>
-                            <input type="time" name="feeding_time" class="form-control form-control-lg border-2 bg-light text-center fw-bold fs-2" required>
+                            {{-- PERBAIKAN: name="waktu" (Sesuai Controller & Database) --}}
+                            <input type="time" name="waktu" class="form-control form-control-lg border-2 bg-light text-center fw-bold fs-2" required>
                         </div>
+                        
+                        {{-- Input Hidden untuk jenis_jadwal default --}}
+                        <input type="hidden" name="jenis_jadwal" value="Harian">
+
                         <button type="submit" class="btn btn-primary w-100 py-3 rounded-3 fw-bold">
                             <i class="bi bi-plus-lg me-2"></i> Simpan Jadwal
                         </button>
@@ -62,13 +74,22 @@
                                         <tr>
                                             <td class="ps-4">
                                                 <h4 class="mb-0 fw-bold text-dark font-monospace">
-                                                    {{ \Carbon\Carbon::parse($schedule->feeding_time)->format('H:i') }}
+                                                    {{-- PERBAIKAN: Gunakan $schedule->waktu --}}
+                                                    {{ \Carbon\Carbon::parse($schedule->waktu)->format('H:i') }}
                                                 </h4>
+                                                <small class="text-muted">{{ $schedule->jenis_jadwal ?? 'Harian' }}</small>
                                             </td>
                                             <td>
-                                                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
-                                                    <i class="bi bi-check-circle-fill me-1"></i> Aktif
-                                                </span>
+                                                {{-- PERBAIKAN: Cek status berdasarkan kolom 'aktif' --}}
+                                                @if($schedule->aktif)
+                                                    <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Aktif
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2 rounded-pill">
+                                                        <i class="bi bi-dash-circle me-1"></i> Non-Aktif
+                                                    </span>
+                                                @endif
                                             </td>
                                             <td class="text-end pe-4">
                                                 <form action="{{ route('schedule.destroy', $schedule->id) }}" method="POST" onsubmit="return confirm('Hapus jadwal ini?');">

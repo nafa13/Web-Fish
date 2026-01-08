@@ -9,10 +9,14 @@ class SensorData extends Model
 {
     use HasFactory;
 
+    // Arahkan ke tabel yang benar
+    protected $table = 'sensor_suhu'; 
+
+    public $timestamps = false;
+
+    // Sesuaikan dengan kolom yang kamu sebutkan tadi
     protected $fillable = [
-        'temperature',
-        'ph_level',
-        'turbidity',
-        'feed_level',
+        'nilai', // Ini yang berisi data suhu
+        'waktu'
     ];
 }

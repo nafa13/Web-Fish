@@ -9,8 +9,16 @@ class Schedule extends Model
 {
     use HasFactory;
 
+    // 1. Beritahu nama tabel yang benar (sesuai gambar Anda)
+    protected $table = 'jadwal'; 
+
+    // 2. Karena di gambar tidak ada kolom 'created_at' & 'updated_at', matikan timestamps
+    public $timestamps = false;
+
+    // 3. Daftarkan kolom yang boleh diedit
     protected $fillable = [
-        'feeding_time',
-        'is_active',
+        'jenis_jadwal',
+        'waktu',
+        'aktif',
     ];
 }

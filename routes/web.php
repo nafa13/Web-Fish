@@ -44,3 +44,9 @@ Route::middleware('auth')->group(function () {
     // Route Fish Status
     Route::get('/fish-status', [FishStatusController::class, 'index'])->name('fish.status');
 });
+
+Route::middleware('auth')->group(function () {
+    Route::get('/fish-status', [FishStatusController::class, 'index'])->name('fish.status');
+    // Tambahkan baris ini:
+    Route::get('/fish-status/realtime', [FishStatusController::class, 'getRealTimeData'])->name('fish.status.realtime');
+});

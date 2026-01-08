@@ -168,11 +168,6 @@
                 <i class="bi bi-activity"></i>
                 <span>Fish Status</span>
             </a>
-
-            <a href="#" class="nav-link {{ request()->is('settings*') ? 'active' : '' }}">
-                <i class="bi bi-gear-fill"></i>
-                <span>Settings</span>
-            </a>
         </nav>
 
         <div class="logout-container">
