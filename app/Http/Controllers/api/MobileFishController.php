@@ -1,34 +1,31 @@
 <?php
 
-namespace app\Http\Controllers\Api;
+namespace App\Http\Controllers\Api; // PERBAIKAN: Huruf 'A' pada App harus besar
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
-use App\Models\SensorData; // Menggunakan model SensorData yang Anda upload
+use App\Models\SensorData; 
 
 class MobileFishController extends Controller
 {
-    // 1. FUNGSI LOGIN (Menerima input JSON dari Flutter)
+    // 1. FUNGSI LOGIN
     public function login(Request $request)
     {
-        // Flutter mengirim field: 'username' dan 'password'
         $request->validate([
             'username' => 'required',
             'password' => 'required',
         ]);
 
-        // Karena di AuthController.php website Anda pakai 'email',
-        // Kita asumsikan input 'username' dari Flutter itu berisi Email.
+        // PERBAIKAN: Gunakan 'username' agar cocok dengan data 'admin_final'
         $credentials = [
-            'email' => $request->username, 
+            'username' => $request->username, // Ubah dari 'email' ke 'username'
             'password' => $request->password
         ];
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            // Kembalikan JSON persis seperti yang diminta Flutter
             return response()->json([
                 'status' => 'success',
                 'message' => 'Login Berhasil',
@@ -38,26 +35,22 @@ class MobileFishController extends Controller
 
         return response()->json([
             'status' => 'failed',
-            'message' => 'Email atau Password salah'
+            'message' => 'Username atau Password salah'
         ], 401);
     }
 
-    // 2. FUNGSI INSERT SUHU (Menerima input dari Flutter)
+    // 2. FUNGSI INSERT SUHU (Tetap)
     public function insertSuhu(Request $request)
     {
-        // Flutter mengirim field: 'suhu' (string/double)
         $request->validate([
             'suhu' => 'required'
         ]);
 
-        // Simpan ke tabel sensor_datas
-        // Kolom di Model SensorData.php Anda adalah 'temperature'
+        // Pastikan model SensorData diarahkan ke tabel yang benar (sensor_suhu)
+        // Sesuai perbaikan kita sebelumnya di file Model
         SensorData::create([
-            'temperature' => $request->suhu,
-            // Nilai default untuk kolom lain agar tidak error (karena di model Anda fillable)
-            'ph_level' => 0, 
-            'turbidity' => 0,
-            'feed_level' => 0 
+            'nilai' => $request->suhu, // PERBAIKAN: Sesuaikan dengan kolom DB 'nilai'
+            'waktu' => now(),          // Tambahkan waktu saat ini
         ]);
 
         return response()->json([
@@ -66,14 +59,67 @@ class MobileFishController extends Controller
         ], 200);
     }
     
-    // 3. FUNGSI AMBIL DATA SUHU TERBARU (Opsional, untuk monitoring Flutter)
-    public function getLatestSuhu()
+    // ... fungsi lain biarkan saja
+
+    public function getSchedules() {
+    // Ambil semua jadwal, urutkan dari jam terkecil
+    $schedules = \App\Models\Schedule::orderBy('waktu', 'asc')->get();
+    return response()->json($schedules);
+}
+
+public function storeSchedule(Request $request) {
+    $request->validate(['waktu' => 'required']);
+
+    \App\Models\Schedule::create([
+        'waktu' => $request->waktu,
+        'aktif' => 1,
+        // Ambil input dari flutter, kalau kosong default 'PAKAN'
+        'jenis_jadwal' => $request->jenis_jadwal ?? 'PAKAN' 
+    ]);
+
+    return response()->json(['message' => 'Sukses']);
+}
+
+// ... fungsi login dll di atas ...
+
+    // 4. FUNGSI TRIGGER MANUAL PAKAN (Dari Tombol Flutter)
+    public function triggerPakan()
     {
-        $data = SensorData::latest()->first();
-        
-        return response()->json([
-            'status' => 'success',
-            'suhu' => $data ? $data->temperature : 0
-        ]);
+        // Ganti IP ini dengan IP ESP32 Anda
+        $ip_esp32 = '192.168.1.100'; 
+
+        try {
+            // Tembak ESP32
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->get("http://{$ip_esp32}/feed");
+            
+            if ($response->successful()) {
+                // Catat di Database
+                \App\Models\FeedingLog::create(['fed_at' => now()]);
+                
+                return response()->json(['status' => 'success', 'message' => 'Sukses memberi pakan!']);
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'ESP32 tidak merespon'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Gagal koneksi ke alat'], 500);
+        }
+    }
+
+    // 5. FUNGSI TRIGGER MANUAL KURAS
+    public function triggerKuras()
+    {
+        $ip_esp32 = '192.168.1.100'; // Ganti IP ESP32
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->get("http://{$ip_esp32}/kuras");
+            
+            if ($response->successful()) {
+                return response()->json(['status' => 'success', 'message' => 'Proses kuras dimulai!']);
+            } else {
+                return response()->json(['status' => 'error', 'message' => 'ESP32 tidak merespon'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Gagal koneksi ke alat'], 500);
+        }
     }
 }
